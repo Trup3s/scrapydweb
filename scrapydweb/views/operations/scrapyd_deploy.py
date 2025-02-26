@@ -64,11 +64,17 @@ def _build_egg(scrapy_cfg_path):
         settings = get_config(scrapy_cfg_path).get('settings', 'default')  # demo.settings
         _create_default_setup_py(settings=settings)
 
+        # Include dependencies if requirements are given
+        if os.path.isfile(path='requirements.txt'):
+            command = 'bdist_uberegg'
+        else:
+            command = 'bdist_egg'
+
         d = tempfile.mkdtemp(prefix="scrapydweb-deploy-")
         o = open(os.path.join(d, "stdout"), "wb")
         e = open(os.path.join(d, "stderr"), "wb")
-        retry_on_eintr(check_call, [sys.executable, 'setup.py', 'clean', '-a', 'bdist_egg', '-d', d],
-                       stdout=o, stderr=e)
+        retry_on_eintr(check_call, [sys.executable, 'setup.py', 'clean', '-a'], stdout=o, stderr=e)
+        retry_on_eintr(check_call, [sys.executable, 'setup.py', command, '-d', d], stdout=o, stderr=e)
         egg = glob.glob(os.path.join(d, '*.egg'))[0]
         o.close()
         e.close()

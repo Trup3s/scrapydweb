@@ -54,6 +54,7 @@ setup(
         "tzlocal==1.5.1",  # Dec 1, 2017
         "w3lib==2.0.0",  # Aug 11, 2022
         "Werkzeug==2.0.0",  # May 12, 2021
+        "uberegg>=0.1.1"
     ],
 
     entry_points={
