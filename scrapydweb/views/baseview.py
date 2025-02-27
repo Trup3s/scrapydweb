@@ -282,7 +282,7 @@ class BaseView(View):
     def remove_microsecond(dt):
         return str(dt)[:19]
 
-    def make_request(self, url, data=None, auth=None, as_json=True, dumps_json=True, check_status=True, timeout=60):
+    def make_request(self, url, data=None, auth=None, as_json=True, dumps_json=True, check_status=True, timeout=120):
         """
         :param url: url to make request
         :param data: None or a dict object to post
