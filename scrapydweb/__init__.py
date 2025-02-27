@@ -80,9 +80,10 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
-    handle_db(app)
-    handle_route(app)
-    handle_template_context(app)
+    with app.app_context():
+        handle_db(app)
+        handle_route(app)
+        handle_template_context(app)
 
     # @app.errorhandler(404)
     # def handle_error(error):
@@ -120,29 +121,28 @@ def handle_db(app: Flask):
     #         self.app = app
     #         if app is not None:
     #             self.init_app(app)
-    with app.app_context():
-        db.app = app  # https://github.com/viniciuschiele/flask-apscheduler/blob/master/examples/flask_context.py
-        db.init_app(app)  # http://flask-sqlalchemy.pocoo.org/2.3/contexts/
-        db.create_all()
+    db.app = app  # https://github.com/viniciuschiele/flask-apscheduler/blob/master/examples/flask_context.py
+    db.init_app(app)  # http://flask-sqlalchemy.pocoo.org/2.3/contexts/
+    db.create_all()
 
-        # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-error-handling
-        @app.teardown_request
-        def handle_db_session(exception):
-            if exception:
-                db.session.rollback()
-            db.session.remove()
+    # https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vii-error-handling
+    @app.teardown_request
+    def handle_db_session(exception):
+        if exception:
+            db.session.rollback()
+        db.session.remove()
 
-        with db.app.app_context():
-            if not Metadata.query.filter_by(version=__version__).first():
-                metadata = Metadata(version=__version__)
-                db.session.add(metadata)
-                db.session.commit()
-        if time.time() - handle_metadata().get('last_check_update_timestamp', time.time()) > 3600 * 24 * 30:
-            handle_metadata('last_check_update_timestamp', time.time())
-            handle_metadata('pageview', 0)
-        else:
-            handle_metadata('pageview', 1)
-        # print(Metadata.query.filter_by(version=__version__).first())
+    with db.app.app_context():
+        if not Metadata.query.filter_by(version=__version__).first():
+            metadata = Metadata(version=__version__)
+            db.session.add(metadata)
+            db.session.commit()
+    if time.time() - handle_metadata().get('last_check_update_timestamp', time.time()) > 3600 * 24 * 30:
+        handle_metadata('last_check_update_timestamp', time.time())
+        handle_metadata('pageview', 0)
+    else:
+        handle_metadata('pageview', 1)
+    # print(Metadata.query.filter_by(version=__version__).first())
 
 
 def handle_route(app):
