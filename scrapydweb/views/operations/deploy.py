@@ -461,7 +461,8 @@ class DeployXhrView(BaseView):
         data = {
             'project': self.project,
             'version': self.version,
-            'egg': content
         }
-        status_code, js = self.make_request(self.url, data=data, auth=self.AUTH)
+        files =[("egg", ("project.egg", content))]
+        
+        status_code, js = self.make_request(self.url, data=data, files=files, auth=self.AUTH)
         return self.json_dumps(js, as_response=True)

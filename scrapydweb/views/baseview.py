@@ -282,7 +282,7 @@ class BaseView(View):
     def remove_microsecond(dt):
         return str(dt)[:19]
 
-    def make_request(self, url, data=None, auth=None, as_json=True, dumps_json=True, check_status=True, timeout=120):
+    def make_request(self, url, data=None, files=None, auth=None, as_json=True, dumps_json=True, check_status=True, timeout=120):
         """
         :param url: url to make request
         :param data: None or a dict object to post
@@ -303,7 +303,7 @@ class BaseView(View):
                     self.logger.debug("POST data: %s", self.json_dumps(data))
 
             if data:
-                r = session.post(url, data=data, auth=auth, timeout=timeout)
+                r = session.post(url, data=data, files=files, auth=auth, timeout=timeout)
             else:
                 r = session.get(url, auth=auth, timeout=timeout)
             r.encoding = 'utf-8'
